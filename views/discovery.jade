@@ -1,0 +1,12 @@
+extends layout
+
+append head
+	script(src="/js/discovery.js")
+
+block content
+	- var tableLocations = Array();
+	input#vicinityRange(type="range", min=0, step="0.5", value=5)
+	label#vicinityRangeLabel(for="vicinityRange")
+	block locations
+		//- var tableLocations = locations
+		//include ./includes/locationsTable.jade

@@ -1,0 +1,5 @@
+- var hrefs = ["/", "/tagging", "/discovery"]
+ul.nav
+	each name, index in ["Home", "Tagging", "Discovery"]
+		li(class=(pageName==name ? 'active' : ''))
+			a(href=hrefs[index])= name

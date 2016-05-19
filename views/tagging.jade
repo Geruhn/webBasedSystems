@@ -1,0 +1,26 @@
+extends layout
+
+append head
+	script(src="/js/tagging.js")
+
+block content
+	if (successfullyPosted)
+		.message.success
+			p The locations was correct.
+	else if(typeof(successfullyPosted) !== 'undefined')
+		.message.error
+			p Sorry, but something about your location was odd.
+			each error, text in errors
+				p= error
+	- var inputs = [ 	{  		id: 'name', 		labelName: 'name', 		attributes : {'type' : 'text', 'pattern': '[A-Za-z]{1,}'} 	}, 	{  		id: 'hashtag', 		labelName: 'hashtag', 		attributes : {'type' : 'text', 'pattern': '[A-Za-z]{1,}'} 	}, 	{  		id: 'latitude', 		labelName: 'latitude', 		attributes : {'type' : 'number', 'step':'any', 'min':-90, 'max':90} 	}, 	{  		id: 'longitude', 		labelName: 'longitude', 		attributes : {'type' : 'number', 'step':'any', 'min':-180, 'max':180} 	} ]
+	form#taggingForm(method="post")
+		fieldset
+			each input, i in inputs
+				.inputRow
+					label(for=input.id)= input.labelName
+					input(id=input.id, name=input.id, value=(postData ? postData[input.id] : ''), required)&attributes(input.attributes)
+			button#submit(type="submit") Add location
+			button#refresh(type="button") Get position
+	block locations
+		- var tableLocations = locations
+		include ./includes/locationsTable.jade

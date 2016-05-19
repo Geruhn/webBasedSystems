@@ -1,0 +1,31 @@
+ul.nav li {
+  display: inline;
+  margin-left: 10px;
+}
+
+ul.nav li.active {
+	font-weight: 800;
+}
+
+.inputRow label {
+  display: inline-block;
+  width: 100px;
+}
+
+form.invalid fieldset {
+	border-color: red;
+}
+
+#vicinityRange::after {
+    content: attr(value);
+    height: 10px;
+    width: 10px;
+}
+
+#vicinityRangeLabel {
+	position: relative;
+	top: -9px;
+	width: 70px;
+	display: inline-block;
+	text-align: right;
+}

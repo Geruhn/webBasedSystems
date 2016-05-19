@@ -1,0 +1,17 @@
+if tableLocations.length > 0
+	if tableLocations.length > 1
+		h2 There are #{tableLocations.length} locations.
+	else 
+		h2 There is #{tableLocations.length} location.
+	table#locations
+		tr
+			each row, key in tableLocations[0]
+				if key != 'id'
+					th= key
+		each row in tableLocations
+			tr
+				each value, key in row
+					if key != 'id'
+						td(data-id=row.id)= value
+else 
+	p There are no locations yet.
