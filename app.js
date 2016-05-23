@@ -3,33 +3,33 @@ var path = require('path');
 var bodyParser = require('body-parser')
 
 var index = require('./routes/index');
-var tagging = require('./routes/tagging');
 var discovery = require('./routes/discovery');
 var api = require('./routes/api.js');
 
 
 var app = express();
+app.tagging = require('./routes/tagging');
 app.locationTable = require('./app/locationTable');
 //app.locations = Array();
 
 // test data
 
 app.locationTable.add({
-	name: 'A', 
+	name: 'A',
 	hashtag: 'school',
 	latitude: 160,
 	longitude: 10
 });
 
 app.locationTable.add({
-	name: 'B', 
+	name: 'B',
 	hashtag: 'school',
 	latitude: -20,
 	longitude: 110
 });
 
 app.locationTable.add({
-	name: 'C', 
+	name: 'C',
 	hashtag: 'school',
 	latitude: -20,
 	longitude: -10
@@ -45,7 +45,7 @@ app.use(bodyParser.urlencoded({
 }));
 app.set('view engine', 'jade');
 app.use('/', index);
-app.use('/tagging', tagging);
+app.use('/tagging', app.tagging);
 app.use('/discovery', discovery);
 app.use('/api', api);
 

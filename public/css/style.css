@@ -25,7 +25,11 @@ form.invalid fieldset {
 #vicinityRangeLabel {
 	position: relative;
 	top: -9px;
-	width: 70px;
+	width: 100px;
 	display: inline-block;
 	text-align: right;
+}
+
+#locations .hide {
+	display: none;
 }

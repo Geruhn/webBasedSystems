@@ -17,6 +17,7 @@ module.exports.add = function(location, callback) {
 //	if(redisIsConnected) {
 
 		client.incr('locationID', function(err, reply) {
+			location.id = reply;
 			client.hmset('locations:' + reply, location, function(err, res) {
 				console.log('locations:' + reply);
 				client.hgetall('locations:' + reply, function(err, reply) {
@@ -47,7 +48,7 @@ module.exports.get = function() {
 };*/
 
 module.exports.getAllLocations = function(callback) {
-	client.keys('locations:[0-9]*', function(err, reply) {
+	client.keys('locations:[1-9]*', function(err, reply) {
 		var res = Array();
 		for(var i = 0; i < reply.length; i++) {
 			client.hgetall(reply[i], (function(length, res, callback) {
@@ -61,6 +62,14 @@ module.exports.getAllLocations = function(callback) {
 		}
 	});
 }
+
+module.exports.update = function(location, callback) {
+	client.hmset('locations:'+location.id, location, function(err, reply) {
+		if(callback) {
+			callback(!err);
+		}
+	});
+};
 
 function simpleClone(object) {
 	return JSON.parse(JSON.stringify(object));

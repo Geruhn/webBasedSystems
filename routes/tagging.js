@@ -27,7 +27,7 @@ router.get('/', function index(req, res, next) {
 	setupOptions();
 	options.title += ' Posted';
 	var location = correctRepresentation(req.body);
-	if(validateLocation(location)) {
+	if(validateLocation(location, options)) {
 		req.app.locationTable.add(location, function(successfullyPosted) {
 			options.successfullyPosted = successfullyPosted;
 			if(!options.successfullyPosted) {
@@ -44,7 +44,7 @@ router.get('/', function index(req, res, next) {
 	} else {
 		options.successfullyPosted = false;
 		options.postData = location
--		appendErrorMessages();
+		appendErrorMessages();
 		req.app.locationTable.getAllLocations((function(res, options) {
 			return function(reply) {
 				options.locations = reply;
@@ -52,26 +52,26 @@ router.get('/', function index(req, res, next) {
 			}
 		})(res, options));
 	}
-
 });
-
 function correctRepresentation(location) {
-	var latFl = parseFloat(location.latitude);
-	var lonFl =  parseFloat(location.longitude);
-	if(!isNaN(latFl)) {
-		location.latitude = latFl;
+	if(location.hasOwnProperty("latitude") && location.hasOwnProperty("longitude")) {
+		var latFl = parseFloat(location.latitude);
+		var lonFl =  parseFloat(location.longitude);
+		if(!isNaN(latFl)) {
+			location.latitude = latFl;
+		}
+		if (!isNaN(lonFl)) {
+			location.longitude = lonFl;
+		}
 	}
-	if (!isNaN(lonFl)) {
-		location.longitude = lonFl;
-	}
-
 	return location;
 }
 
-function validateLocation(location) {
+
+function validateLocation(location, options) {
 	options.errors = {};
-	options.errors.nameIsEmpty = location.name.length === 0;
-	options.errors.hashtagIsEmpty = location.hashtag.length === 0;
+	options.errors.nameIsEmpty = location.hasOwnProperty("name") && location.name.length === 0;
+	options.errors.hashtagIsEmpty = location.hasOwnProperty("hashtag") &&  location.hashtag.length === 0;
 	options.errors.latitudeIsNaN = typeof(location.latitude) !== 'number';
 	options.errors.longitudeIsNaN = typeof(location.longitude) !== 'number';
 
@@ -81,10 +81,12 @@ function validateLocation(location) {
 							&& !options.errors.longitudeIsNaN
 							&& !location.hasOwnProperty("id");/*
 							&& !isNaN(location.latitude)
-							&& !isNaN(location.longitude);*/
+							&& !isNaNsentation;
+module.exports.validateLocation = validateLocation;(location.longitude);*/
 
 	return correctedLocation;
 }
+
 
 function setupOptions() {
 	options = JSON.parse(JSON.stringify(defaultOptions));
@@ -101,3 +103,5 @@ function appendErrorMessages() {
 }
 
 module.exports = router;
+module.exports.correctRepresentation = correctRepresentation;
+module.exports.validateLocation = validateLocation;
