@@ -8,13 +8,22 @@ var defaultOptions = {
 /* GET home page. */
 router.get('/', function index(req, res, next) {
 	setupOptions();
-	options.locations = req.app.locationTable.get();
-	res.render('discovery', options);
+	//options.locations = req.app.locationTable.getAllLocations();
+	req.app.locationTable.getAllLocations((function(res, options) {
+		return function(reply) {
+			options.locations = reply;
+			res.render('discovery', options);
+		}
+	})(res, options));
 }).post('/', function getVicinity(req, res, next) {
 	setupOptions();
 
-	options.locations = req.app.locationTable.get();
-	res.render('discovery', options);
+	req.app.locationTable.getAllLocations((function(res, options) {
+		return function(reply) {
+			options.locations = reply;
+			res.render('discovery', options);
+		}
+	})(res, options));
 });
 
 function simpleClone(object) {
@@ -28,7 +37,7 @@ function setupOptions() {
 function toDegrees(rad) {
 	return rad*(180/Math.PI);
 }
- 
+
 function toRadians(deg) {
 	return deg * (Math.PI/180);
 }

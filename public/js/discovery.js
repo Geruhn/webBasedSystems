@@ -8,7 +8,7 @@ var locationsInTable;
 var lastLocationÍndex;
 document.addEventListener('DOMContentLoaded', function() {
 	inputVicinityRange = document.getElementById('vicinityRange');
-	
+
 	var xhr = new XMLHttpRequest();
 	xhr.open('GET', './api/locations/');
 	xhr.send(null);
@@ -48,7 +48,7 @@ function updateLocationsTable(event) {
 function sortLocations(locA, locB) {
 	if(locA.distance < locB.distance) {
 		return -1;
-	} 
+	}
 	if (locA.distance > locB.distance) {
 		return 1;
 	}
@@ -59,7 +59,7 @@ function sortLocations(locA, locB) {
 function toDegrees(rad) {
 	return rad*(180/Math.PI);
 }
- 
+
 function toRadians(deg) {
 	return deg * (Math.PI/180);
 }
@@ -68,6 +68,7 @@ function calculateDistances() {
 	for(var i = 0; i < allLocations.length; i++) {
 		allLocations[i].distance = calculateDistance(currentLocation.latitude, currentLocation.longitude, allLocations[i].latitude, allLocations[i].longitude);
 	}
+	allLocations.sort(sortLocations);
 }
 
 function calculateDistance(lat1, lon1, lat2, lon2) {

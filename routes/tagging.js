@@ -8,30 +8,51 @@ var options;
 var errorMessages = {
 	nameIsEmpty: "The name field was empty.",
 	hashtagIsEmpty: "The hashtag field was empty.",
-	latitudeIsNaN: "The latitude was not a number.", 
+	latitudeIsNaN: "The latitude was not a number.",
 	longitudeIsNaN: "The longitude was not a number.",
 
 }
 /* GET home page. */
 router.get('/', function index(req, res, next) {
 	setupOptions();
-	options.locations = req.app.locationTable.get();
-	res.render('tagging', options);
+	req.app.locationTable.getAllLocations((function(res, options) {
+		return function(reply) {
+			options.locations = reply;
+			res.render('tagging', options);
+		}
+	})(res, options));
+	//res.render('tagging', options);
 })
 .post('/', function postingTag(req, res, next) {
 	setupOptions();
 	options.title += ' Posted';
 	var location = correctRepresentation(req.body);
 	if(validateLocation(location)) {
-		req.app.locationTable.add(location);
-		options.successfullyPosted = true;
+		req.app.locationTable.add(location, function(successfullyPosted) {
+			options.successfullyPosted = successfullyPosted;
+			if(!options.successfullyPosted) {
+				options.postData = location;
+				appendErrorMessages();
+			}
+			req.app.locationTable.getAllLocations((function(res, options) {
+				return function(reply) {
+					options.locations = reply;
+					res.render('tagging', options);
+				}
+			})(res, options));
+		});
 	} else {
 		options.successfullyPosted = false;
 		options.postData = location
-		appendErrorMessages();
+-		appendErrorMessages();
+		req.app.locationTable.getAllLocations((function(res, options) {
+			return function(reply) {
+				options.locations = reply;
+				res.render('tagging', options);
+			}
+		})(res, options));
 	}
-	options.locations = req.app.locationTable.get();
-	res.render('tagging', options);
+
 });
 
 function correctRepresentation(location) {
@@ -39,7 +60,7 @@ function correctRepresentation(location) {
 	var lonFl =  parseFloat(location.longitude);
 	if(!isNaN(latFl)) {
 		location.latitude = latFl;
-	} 
+	}
 	if (!isNaN(lonFl)) {
 		location.longitude = lonFl;
 	}
