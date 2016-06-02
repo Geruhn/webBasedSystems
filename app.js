@@ -15,22 +15,22 @@ app.locationTable = require('./app/locationTable');
 // test data
 
 app.locationTable.add({
-	name: 'A',
-	hashtag: 'school',
+	name: 'HSKA',
+	hashtag: 'school, workplace',
 	latitude: 160,
 	longitude: 10
 });
 
 app.locationTable.add({
-	name: 'B',
-	hashtag: 'school',
+	name: 'Büro',
+	hashtag: 'school, workplace',
 	latitude: -20,
 	longitude: 110
 });
 
 app.locationTable.add({
-	name: 'C',
-	hashtag: 'school',
+	name: 'Cha Cha Unterricht',
+	hashtag: 'school ,fun',
 	latitude: -20,
 	longitude: -10
 });
