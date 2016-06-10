@@ -13,8 +13,17 @@ client.on('error', function(err) {
 	//console.log(err);
 });
 
+module.exports.get = function(id, callback) {
+	client.hgetall('locations:' + id, function(err, reply) {
+		if (callback) {
+			callback(!err, reply);
+		}
+	})
+}
+
 module.exports.add = function(location, callback) {
 //	if(redisIsConnected) {
+		console.log(location);
 		var options = {};
 		location = correctRepresentation(location);
 		//console.log('ASDF1');
@@ -29,7 +38,6 @@ module.exports.add = function(location, callback) {
 
 			client.incr('locationID', function(err, id) {
 				id -= 1; //is done so IDs start with 0 and I dont have to lock, get, incr, unlock, hmset
-				location.id = id;
 				if(!err) {
 					//console.log('ASDF2');
 					//console.log(location.hashtag);
@@ -46,21 +54,41 @@ module.exports.add = function(location, callback) {
 										if(!err) {
 											client.sadd('locations', location.name, function(err, reply) {
 												if(!err) {
+													var status = {
+														hashtagsLength: 0,
+														lastRequestForHashtagWasSent: false
+													}
 													for (var i = hashtags.length - 1; i >= 0; i--) {
-														//console.log('adding hashtag: ' + hashtags[i]);
-														client.sadd('hashtag:' + hashtags[i], id, ( function(tag) {
+														//console.log('adding id ' + id + ' to hashtag ' + hashtags[i]);
+														status.hashtagsLength++;
+														//console.log('status.hashtagsLength is now: ' + status.hashtagsLength);
+														client.sadd('hashtag:' + hashtags[i], id, ( function(tag, status) {
 																return function(err, reply) {
 																	if(!err) {
-																		client.sadd('hashtags', tag, function(err, reply) {
-																			if(callback && i == 0) {
-																				//console.log('adding hashtags done');
-																				callback(!err, options);
+																		//console.log("No Error");
+																		//console.log('Adding hashtag: ' + tag + ' to the hashtags list');
+																		client.sadd('hashtags', tag, (function(status) {
+																			return function(err, reply) {
+																				status.hashtagsLength--;
+																				if(!err) {
+
+																					//console.log('status.lastRequestForHashtagWasSent is now: ' + status.lastRequestForHashtagWasSent);
+																					//console.log('status.hashtagsLength is now: ' + status.hashtagsLength);
+																					if(status.lastRequestForHashtagWasSent && status.hashtagsLength === 0) {
+																						//console.log('adding hashtags done');
+																						if(callback) {
+																							callback(!err, options);
+																						}
+																					}
+																				}
 																			}
-																		});
+																		})(status));
 																	}
 																}
-														})(hashtags[i]));
+														})(hashtags[i], status));
 													}
+													status.lastRequestForHashtagWasSent = true;
+													//console.log('status.lastRequestForHashtagWasSent is now: ' + status.lastRequestForHashtagWasSent);
 												}
 											});
 										}
@@ -78,7 +106,7 @@ module.exports.add = function(location, callback) {
 		}
 
 //	}
-
+//TRANSACTIONS versuchen
 };
 
 module.exports.search = function(searchterm, callback) {
@@ -90,9 +118,7 @@ module.exports.search = function(searchterm, callback) {
 	var searchH = Array();
 
 	var status = {
-		locationReceived: false,
-		hashtagsReceived: false,
-		result: "",
+		result: "", //debugging Array
 		resultLength: 0,
 		lastRequestForIdWasSent: false,
 		lastRequestForLocationWasSent: false,
@@ -100,7 +126,7 @@ module.exports.search = function(searchterm, callback) {
 		idsLength: 0,
 		locations: "",
 		locationsLength: 0,
-		errors: {
+		errors: { 					//not yet implemented
 			getLocations: false,
 			getHashtags: false,
 			getIds: false,
@@ -119,65 +145,6 @@ module.exports.search = function(searchterm, callback) {
 
 	getAllLocationNames(makeResultCallback("location", status, searchterm, callback))
 	getAllHashtagNames(makeResultCallback("hashtag", status, searchterm, callback));
-/*
-	console.log("Searching:" + searchterm);
-	getAllLocationNames(function(err, reply) {
-		if(!err) {
-			for (var i = reply.length - 1; i >= 0; i--) {
-				searchL.push(reply[i]);
-			}
-			getAllHashtagNames(function(err, reply) {
-				if(!err) {
-					for (var i = reply.length - 1; i >= 0; i--) {
-						searchH.push(reply[i]);
-					}
-
-					var searchterm = RegExp(searchterm, 'gi');
-					for (var i = searchH.length - 1; i >= 0; i--) {
-						if(searchH[i].search(searchterm) >= 0) {
-							result.push('hashtag:' + searchH[i]);
-							console.log('Pushing');
-						}
-					}
-					for (var i = searchL.length - 1; i >= 0; i--) {
-						if(searchL[i].search(searchterm) >= 0) {
-							result.push('location:' + searchL[i]);
-							console.log('Pushing');
-						}
-					}
-					console.log(result);
-					var ids = Array();
-					var idsLength = 0;
-					for (var i = result.length - 1; i >= 0; i--) {
-						client.smembers(result[i], (function(length, ids, callback, finalCallback) {
-							return function(err, reply) {
-								idsLength += reply.length;
-								for (var i = reply.length - 1; i >= 0; i--) {
-									ids.push(reply[i]);
-								}
-								callback(length, ids, idsLength, finalCallback);
-							}
-						})(result.length, ids, idsLength, function(length, ids, idsLength, finalCallback) {
-							for (var i = ids.length - 1; i >= 0; i--) {
-								var finalResults = Array();
-								client.hgetall(ids[i], function(err, reply) {
-									finalResults.push(reply);
-								});
-								if(length === 0 && idsLength === 0) {
-									finalCallback();
-								}
-							}
-						}, callback));
-					}
-					res.status(200).send('Success');
-				} else {
-					res.status(500).send('Sorry, something went wrong');
-				}
-			});
-		} else {
-			res.status(500).send('Sorry, something went wrong');
-		}
-	});*/
 };
 
 module.exports.remove = function(id, callback) {
@@ -186,14 +153,8 @@ module.exports.remove = function(id, callback) {
 			callback(!err)
 		}
 	});
-};/*
-module.exports.get = function() {
-//	if(redisIsConnected) {
-		return simpleClone(locations);
-//	} else {
+};
 
-//	}
-};*/
 function getAllLocationNames(callback) {
 	client.smembers('locations', function(err, reply) {
 		callback(err, reply);
@@ -218,7 +179,7 @@ module.exports.getAllLocations = function(callback) {
 				return function(err, reply) {
 					res.push(reply);
 					if(res.length == length) {
-						callback(res);
+						callback(err, res);
 					}
 				}
 			})(reply.length, res, callback));
@@ -227,11 +188,9 @@ module.exports.getAllLocations = function(callback) {
 }
 
 module.exports.update = function(location, callback) {
-	client.hmset('locations:'+location.id, location, function(err, reply) {
-		if(callback) {
-			callback(!err);
-		}
-	});
+	console.log("Huh?");
+	module.exports.add(location, callback);
+	console.log("jo");
 };
 
 function makeResultCallback(prefix, status, searchterm, callback) {
@@ -241,8 +200,7 @@ function makeResultCallback(prefix, status, searchterm, callback) {
 			for (var i = reply.length - 1; i >= 0; i--) {
 				if(reply[i].search(searchtermRE) >= 0) {
 					status.resultLength++;
-					status.result.push(prefix + ":" + reply[i]);
-					//console.log(status);
+					//status.result.push(prefix + ":" + reply[i]);
 
 					client.smembers(prefix + ":" + reply[i], makeIdResultCallback(status, callback));
 				}

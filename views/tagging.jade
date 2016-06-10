@@ -2,6 +2,8 @@ extends layout
 
 append head
 	script(src="/js/tagging.js")
+	script(src="/js/locationTable.js")
+
 
 block content
 	if (successfullyPosted)
@@ -12,12 +14,13 @@ block content
 			p Sorry, but something about your location was odd.
 			each error, text in errors
 				p= error
-	- var inputs = [ 	{  		id: 'name', 		labelName: 'name', 		attributes : {'type' : 'text', 'pattern': '[A-Za-z]{1,}'} 	}, 	{  		id: 'hashtag', 		labelName: 'hashtag', 		attributes : {'type' : 'text', 'pattern': '[A-Za-z]{1,}'} 	}, 	{  		id: 'latitude', 		labelName: 'latitude', 		attributes : {'type' : 'number', 'step':'any', 'min':-90, 'max':90} 	}, 	{  		id: 'longitude', 		labelName: 'longitude', 		attributes : {'type' : 'number', 'step':'any', 'min':-180, 'max':180} 	} ]
+	- var inputs = [ 	{  		id: 'name', 		labelName: 'name', 		attributes : {'type' : 'text', 'pattern': '[A-Za-zÄÖÜäöüß]{1,}'} 	}, 	{  		id: 'hashtag', 		labelName: 'hashtag', 		attributes : {'type' : 'text', 'pattern': '([A-Za-zÄÖÜäöüß]+[A-Za-zÄÖÜäöüß ]+(, )?)+'} 	}, 	{  		id: 'latitude', 		labelName: 'latitude', 		attributes : {'type' : 'number', 'step':'any', 'min':-90, 'max':90} 	}, 	{  		id: 'longitude', 		labelName: 'longitude', 		attributes : {'type' : 'number', 'step':'any', 'min':-180, 'max':180} }, {id:'id', attributes: {'type':'hidden'}} ]
 	form#taggingForm(method="post")
 		fieldset
 			each input, i in inputs
 				.inputRow
-					label(for=input.id)= input.labelName
+					if(input.labelName)
+						label(for=input.id)= input.labelName
 					input(id=input.id, name=input.id, value=(postData ? postData[input.id] : ''), required)&attributes(input.attributes)
 			button#submit(type="submit") Add location
 			button#refresh(type="button") Get position

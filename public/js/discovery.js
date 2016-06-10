@@ -14,15 +14,15 @@ document.addEventListener('DOMContentLoaded', function() {
 	xhr.open('GET', './api/locations/');
 	xhr.send(null);
 	xhr.onreadystatechange = function () {
-		var DONE = 4; // readyState 4 means the request is done.
-		var OK = 200; // status 200 is a successful return.
+		var DONE = 4;
+		var OK = 200;
 		if (xhr.readyState === DONE) {
 			if (xhr.status === OK) {
-				allLocations = JSON.parse(xhr.responseText); 	// 'This is the returned text.'
+				allLocations = JSON.parse(xhr.responseText);
 				calculateDistances();
 				sortTable();
 			} else {
-		  		console.log('Error: ' + xhr.status); 		// An error occurred during the request.
+		  		console.log('Error: ' + xhr.status);
 	  		}
 		}
 	}

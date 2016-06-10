@@ -1,0 +1,13 @@
+extends layout
+
+block content
+	form(method="post")
+		h1 Updating "#{location.name}"
+		each value, key in location
+			.inputRow
+				if(key != "id")
+					label(for=key)= key
+					input(id=key, name=key, value=value, required)
+		input(type="hidden", value=location.id, name="id")
+
+		button(type="submit") Update

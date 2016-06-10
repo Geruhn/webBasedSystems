@@ -4,7 +4,7 @@ var errors = Array();
 var errorMessages = {
 	nameIsEmpty: "The name field was empty.",
 	hashtagIsEmpty: "The hashtag field was empty.",
-	latitudeIsNaN: "The latitude was not a number.", 
+	latitudeIsNaN: "The latitude was not a number.",
 	longitudeIsNaN: "The longitude was not a number."
 }
 document.addEventListener('DOMContentLoaded', function() {
@@ -66,7 +66,7 @@ function refresh () {
 	navigator.geolocation.getCurrentPosition(function(position){
 		lat.value = position.coords.latitude;
 		lon.value = position.coords.longitude;
-		lat.validate(); 
+		lat.validate();
 		lon.validate();
 	});
 }

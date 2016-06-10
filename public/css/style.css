@@ -33,3 +33,17 @@ form.invalid fieldset {
 #locations .hide {
 	display: none;
 }
+
+td.actions button {
+	height: 28px;
+	width: 28px;
+	border-radius: 5px;
+}
+
+td.actions button.update-button {
+	background: url('../img/edit_small.png');
+}
+
+td.actions button.delete-button {
+	background: url('../img/delete_small.png');
+}

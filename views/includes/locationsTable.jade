@@ -16,5 +16,9 @@ if tableLocations.length > 0
 						if key != 'id'
 							- //td(id="location-" + row.id)= value
 							td= value
+					td.actions
+						form
+							button.update-button(id="update-location-" + row.id, type="submit", formmethod="get" formaction="tagging/update/#{row.id}")
+							button.delete-button(id="delete-location-" + row.id, type="submit", formmethod="get" formaction="tagging/delete/#{row.id}")
 else
 	p There are no locations yet.

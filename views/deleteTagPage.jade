@@ -1,0 +1,11 @@
+extends layout
+
+block content
+	form(method="post")
+		h1 Deleting "#{location.name}"
+		p Associated hashtags are:
+			ul
+				each value, key in location.hashtag
+					li #{value}
+		p lat/lon: #{location.latitude}/#{location.longitude}
+		button(type="submit") Delete

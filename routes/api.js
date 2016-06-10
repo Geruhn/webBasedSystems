@@ -9,6 +9,7 @@ router.get('/locations', function(req, res, next) {
 });
 //add
 router.post('/locations', function(req, res, next) {
+	var location = JSON.parse(req.body['data']);
 	req.app.locationTable.add(location, function(success) {
 		if(success) {
 			res.status(200).send('Success');
@@ -37,7 +38,6 @@ router.get('/location/:searchterm', function(req, res, next) {
 	req.app.locationTable.search(req.params.searchterm, (function(res) {
 		return function(err, reply) {
 			if(!!err) {
-				console.log(reply);
 				res.json(reply);
 			} else {
 				res.status(404).send("You're requested searchterm delivered no results.");
